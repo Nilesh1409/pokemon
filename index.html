@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pokemon</title>
+    <style>
+        table{
+            margin: 20px 30%;
+        }
+        tr, th{
+            border: 1px solid black;
+        }
+        h1{
+            text-align: center;
+            display: inline;
+        }
+        #search{
+            display: inline;
+            margin-left: 50%;
+        }
+        #submit{
+            display: inline;
+        }
+    </style>
+</head>
+<body>
+    <h1>Pokemon</h1>
+    <input id="search" type="text">
+    <input id="submit" type="submit">
+    <div id="box"></div>;
+    <table id="table">
+       <thead>
+       <th>Pokemon Name</th>
+       <!-- <th>pokemon</th> -->
+       </thead>
+       <tbody id="tbody">
+
+       </tbody>
+    </table>
+
+    <script>
+          let pokemonNames = JSON.parse(localStorage.getItem("pokemonNames")) || [];
+           if(pokemonNames.length == 0){
+                let responce = fetch("https://pokeapi.co/api/v2/pokemon/");
+                
+                let names = [];
+
+        responce.then(function (result){
+            result.json().then(function(result1){
+                console.log(result1)
+               result1.results.forEach(pokemon => {
+                   names.push(pokemon.name)
+                   let th = document.createElement("tr");
+                   th.innerText = pokemon.name;
+                   document.querySelector("#tbody").append(th);
+               });
+               localStorage.setItem("pokemonNames",JSON.stringify(names));
+
+            }).catch()
+        }).catch()
+           }else{
+            pokemonNames.forEach(pokemon => {
+                   let th = document.createElement("tr");
+                   th.innerText = pokemon;
+                   document.querySelector("#tbody").append(th);
+               });
+           }
+            document.querySelector("#submit").addEventListener("click",searchFun)
+
+            function searchFun(){
+                let name = document.getElementById("search").value;
+              let respond = fetch("https://pokeapi.co/api/v2/pokemon/" +name+"/");
+
+           respond.then(function (result){
+               
+            result.json().then(function(result1){
+            //   console.log(result1)
+            
+
+                let id = document.createElement("p");
+                id.innerText = "Id : " + result1.id;
+                let name = document.createElement("p");
+                name.innerText = "Name : " + result1.name;
+                let height = document.createElement("p");
+                height.innerText = "Height : "+result1.height;
+                let weight = document.createElement("p").innerText = "Weight : "+result1.weight;
+                let ablArr = []
+                result1.abilities.forEach(data => {
+                  ablArr.push(data.ability.name);
+                })
+                let abl = document.createElement("p").innerText = "Abilities : " +ablArr;
+                let box = document.createElement("div")
+                box.append(id,name,height,abl)
+                document.querySelector("#box").append(box)
+
+
+
+            }).catch()
+
+            }).catch()
+            }
+            
+
+
+
+
+        
+    </script>
+</body>
+</html>
